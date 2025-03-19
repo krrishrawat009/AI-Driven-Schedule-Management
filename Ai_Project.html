@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Schedule Management</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #252525;
+            --dark-element: #333333;
+            --darker-element: #222222;
+            --accent-color: #ffcc00;
+            --accent-hover: #ffd700;
+            --button-color: #ff3d3d;
+            --button-hover: #cc0000;
+            --success-color: #4caf50;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            --transition-speed: 0.3s;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 3px;
+            background-color: var(--accent-color);
+            bottom: -10px;
+            left: 20%;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: rgba(0, 0, 0, 0.9);
+            color: var(--text-primary);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all var(--transition-speed) ease;
+        }
+
+        header.scrolled {
+            padding: 10px 0;
+            background-color: rgba(0, 0, 0, 0.95);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        nav ul li a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all var(--transition-speed) ease;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: all var(--transition-speed) ease;
+            transform: translateX(-50%);
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        nav ul li a:hover::after {
+            width: 80%;
+        }
+
+        nav ul li a.active {
+            color: var(--accent-color);
+        }
+
+        nav ul li a.active::after {
+            width: 80%;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        #home {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)), url('/api/placeholder/1200/600') no-repeat center center/cover;
+            color: var(--text-primary);
+            padding: 180px 20px 100px;
+            text-align: center;
+            position: relative;
+        }
+
+        #home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 204, 0, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+        }
+
+        #home .content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #home p {
+            margin-bottom: 40px;
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--button-color);
+            color: var(--text-primary);
+            border: none;
+            padding: 14px 32px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all var(--transition-speed) ease;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(255, 61, 61, 0.3);
+        }
+
+        .btn:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 61, 61, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Section Styling */
+        section {
+            padding: 100px 20px;
+            position: relative;
+        }
+
+        section:nth-child(even) {
+            background-color: var(--secondary-bg);
+        }
+
+        /* Features Section */
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .features-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature {
+            background-color: var(--dark-element);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: left;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform var(--transition-speed) ease;
+            z-index: 2;
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        /* Activity Section */
+        #activity {
+            background-color: var(--secondary-bg);
+        }
+
+        .activity-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 992px) {
+            .activity-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-card {
+            background-color: var(--dark-element);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            margin: 12px 0 8px;
+            color: var(--accent-color);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        form label i {
+            margin-right: 8px;
+        }
+
+        form input, form select, form textarea {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 5px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 8px;
+            background-color: var(--darker-element);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        form input:focus, form select:focus, form textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.2);
+        }
+
+        form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        form .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        form .form-row > div {
+            flex: 1;
+        }
+
+        form .form-help {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        /* Timetable Output */
+        #timetableOutput {
+            background-color: var(--dark-element);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        #timetableOutput h3 {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #timetableOutput h3 i {
+            margin-right: 10px;
+        }
+
+        #taskList {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* Custom scrollbar */
+        #taskList::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #taskList::-webkit-scrollbar-track {
+            background: var(--darker-element);
+            border-radius: 10px;
+        }
+
+        #taskList::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+        }
+
+        #taskList li {
+            background-color: var(--darker-element);
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        #taskList li:hover {
+            transform: translateX(5px);
+        }
+
+        #taskList li .task-content {
+            flex: 1;
+        }
+
+        #taskList li .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        #taskList li .task-actions button {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            transition: color var(--transition-speed) ease;
+            padding: 5px;
+        }
+
+        #taskList li .task-actions button:hover {
+            color: var(--text-primary);
+        }
+
+        #taskList li .task-actions button.delete:hover {
+            color: #ff4444;
+        }
+
+        .task-priority {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-right: 10px;
+        }
+
+        .priority-high {
+            background-color: rgba(255, 70, 70, 0.2);
+            color: #ff4646;
+            border: 1px solid rgba(255, 70, 70, 0.3);
+        }
+
+        .priority-medium {
+            background-color: rgba(255, 204, 0, 0.2);
+            color: #ffc400;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+
+        .priority-low {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* About Section */
+        #about {
+            background-color: var(--primary-bg);
+            text-align: center;
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .team-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .team-member {
+            background-color: var(--dark-element);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+        }
+
+        .team-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .team-info {
+            padding: 20px;
+        }
+
+        .team-info h4 {
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+
+        .team-info p {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        /* Contact Section */
+        #contact {
+            background-color: var(--secondary-bg);
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 992px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .contact-info h3 {
+            margin-bottom: 20px;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--dark-element);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .contact-text h4 {
+            margin-bottom: 5px;
+        }
+
+        .contact-text p {
+            color: #999;
+        }
+
+        .form-submit {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #000;
+            color: var(--text-primary);
+            padding: 50px 0 20px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            text-align: left;
+            padding: 0 20px;
+        }
+
+        .footer-section h4 {
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-section h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+
+        .footer-section p {
+            margin-bottom: 15px;
+            color: #999;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: #999;
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background-color: var(--dark-element);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .social-links a:hover {
+            background-color: var(--accent-color);
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Success Animation */
+        @keyframes success-animation {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-message {
+            display: none;
+            background-color: var(--success-color);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            animation: success-animation 0.5s ease forwards;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background-color: var(--dark-element);
+            color: var(--text-primary);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 300px;
+            max-width: 400px;
+            animation: toast-in 0.3s ease forwards;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid #ff4444;
+        }
+
+        .toast.warning {
+            border-left: 4px solid #ffbb33;
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .toast-icon {
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            margin-left: 15px;
+        }
+
+        @keyframes toast-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes toast-out {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            h2 {
+                font-size: 2rem;
+            }
+            section {
+                padding: 80px 20px;
+            }
+            #home {
+                padding: 150px 20px 80px;
+            }
+            form .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: rgba(0, 0, 0, 0.95);
+                flex-direction: column;
+                padding: 20px 0;
+                clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+                transition: clip-path 0.4s ease;
+                z-index: 999;
+            }
+            
+            nav ul.active {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            
+            nav ul li {
+                text-align: center;
+                margin: 15px 0;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+                font-size: 0.9rem;
+            }
+            
+            .feature {
+                padding: 25px;
+            }
+            
+            #home p {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            section {
+                padding: 60px 15px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+            
+            .feature {
+                padding: 20px;
+            }
+            
+            #taskList li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            #taskList li .task-actions {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .toast {
+                min-width: auto;
+                max-width: 300px;
+            }
+
+
+         /* Your existing styles remain unchanged */
+         .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .contact-form button {
+            padding: 10px;
+            background-color: #d8ddd7;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .contact-form button:hover {
+            background-color: #ffd700;
+        }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container for Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header id="header">
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">AI Schedule</a>
+                <button class="mobile-toggle" id="mobileToggle">☰</button>
+                <ul id="navMenu">
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#activity">Activity</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home">
+        <div class="content">
+            <h1>AI-Driven Schedule Management</h1>
+            <p>Experience the future of productivity with our advanced artificial intelligence that learns your patterns and optimizes your time for maximum efficiency.</p>
+            <button class="btn" onclick="scrollToSection('features')">Explore Features</button>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="section-header">
+            <h2>Smart Features</h2>
+            <p>Discover how our AI technology revolutionizes your daily planning</p>
+        </div>
+        <div class="features-container">
+            <div class="feature">
+                <div class="feature-icon">🧠</div>
+                <h3>Predictive Analysis</h3>
+                <p>Our sophisticated machine learning algorithms analyze your past behavior to predict optimal task sequencing and time allocation.</p>
+                <p>The system continuously improves as it learns your productivity patterns, working style, and preferences.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔄</div>
+                <h3>Adaptive Rescheduling</h3>
+                <p>Experience real-time adjustment of schedules based on dynamic environmental and personal factors.</p>
+                <p>When unexpected events arise, the AI automatically reorganizes your day while maintaining priority alignment.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💬</div>
+                <h3>NLP Task Input</h3>
+                <p>Use Natural Language Processing to input tasks in plain language and let the AI interpret and organize your schedule.</p>
+                <p>Simply describe your tasks as you would to a personal assistant, and our system handles the details.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="activity">
+        <div class="section-header">
+            <h2>Create Your Smart Schedule</h2>
+            <p>Add tasks to your schedule and let our AI optimize your day</p>
+        </div>
+        <div class="activity-container">
+            <div class="form-card">
+                <form id="timetableForm">
+                    <div class="form-row">
+                        <div>
+                            <label for="date">📅 Date:</label>
+                            <input type="date" id="date" name="date" required aria-label="Select date">
+                        </div>
+                        <div>
+                            <label for="time">⏰ Time:</label>
+                            <input type="time" id="time" name="time" required aria-label="Select time">
+                        </div>
+                    </div>
+                    
+                    <label for="priority">🔖 Priority:</label>
+                    <select id="priority" name="priority" required aria-label="Select priority">
+                        <option value="">-- Select Priority --</option>
+                        <option value="high">High Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                    <div class="form-help">Higher priority tasks will be scheduled during your peak productivity hours.</div>
+                    
+                    <label for="task">📝 Task Description:</label>
+                    <textarea id="task" name="task" placeholder="Describe your task in natural language. For example: 'I need to prepare the quarterly report for the marketing team by Friday.'" required aria-label="Enter task description"></textarea>
+                    <div class="form-help">The AI will analyze your description to understand task requirements and duration.</div>
+                    
+                    <div class="form-submit">
+                        <button type="submit" class="btn">Add to Schedule</button>
+                    </div>
+                    <div id="formSuccess" class="success-message">
+                        Task successfully added to your schedule!
+                    </div>
+                </form>
+            </div>
+            
+            <div id="timetableOutput">
+                <h3>📋 Your Optimized Schedule</h3>
+                <ul id="taskList">
+                    <!-- Tasks will be added here dynamically -->
+                </ul>
+                <div id="emptyState" class="empty-state">
+                    <div>📅</div>
+                    <h4>Your schedule is empty</h4>
+                    <p>Add tasks using the form to get started</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+ <section id="contact">
+    <div class="section-header">
+        <h2>Contact Us</h2>
+        <p>Have any questions? Reach out to us!</p>
+    </div>
+    <div class="contact-container">
+        <div class="contact-info">
+            <div class="contact-method">
+                <div class="contact-icon">📧</div>
+                <div class="contact-text">
+                    <h4>Email</h4>
+                    <p><a href="mailto:kr9221@srmist.edu">kr9221@srmist.edu</a></p>
+                </div>
+            </div>
+        </div>
+        <form class="contact-form" id="contactForm">
+            <input type="email" id="userEmail" placeholder="Your Email" required>
+            <textarea id="userMessage" placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+        <p id="confirmationMessage" style="display:none; color: green; margin-top: 10px;">Message sent successfully!</p>
+    </div>
+</section>
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        document.getElementById('confirmationMessage').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('confirmationMessage').style.display = 'none';
+        }, 3000);
+        this.reset();
+    });
+</script>
+    <section id="about">
+        <div class="section-header">
+            <h2>About Our Team</h2>
+            <p>Meet the innovators behind the technology</p>
+        </div>
+        <div class="about-content">
+            <p>Founded by a team of AI specialists and productivity experts from SRM Institute of Science and Technology (SRMIST), our mission is to revolutionize how people manage their time and tasks.</p>
+            <p>Our interdisciplinary team combines expertise in machine learning, productivity psychology, and user experience design to create the most intelligent scheduling system available.</p>
+        </div>
+        <div class="team-container">
+            <div class="team-member">
+                
+                <div class="team-info">
+                    <h4> Mehek Dedhia</h4>
+                    <p>Team Member</p>
+                </div>
+                <div class="team-info">
+                    <h4>Krishna Rawat </h4>
+                    <p>Team Member</p>
+                </div>
+                <div class="team-info">
+                    <h4>Stuthi Deb</h4>
+                    <p>Team Member</p>
+                </div>
+                <div class="team-info">
+                    <h4>Anmol Sharma</h4>
+                    <p>Team Member</p>
+                </div>
+            </div>
+            
